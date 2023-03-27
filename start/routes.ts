@@ -17,11 +17,21 @@
 | import './routes/customer'
 |
 */
-
+import Event from '@ioc:Adonis/Core/Event'
 import Route from '@ioc:Adonis/Core/Route'
 
 Route.get('/', async () => {
   return { hello: 'world' }
+})
+
+Route.post('/post', async( {response} ) => {
+  Event.emit('new:post', 'new post')
+  return response.ok({message: 'post created'})
+})
+
+Route.post('/testEvent',async({response})=> {
+  Event.emit('testEvent', 'testEvent')
+  return response.ok({message: 'testEvent created'})
 })
 
 Route.get('/events', async({response}) => {
@@ -29,7 +39,13 @@ Route.get('/events', async({response}) => {
   stream.writeHead(200, {
     'Content-Type': 'text/event-stream',
     'Cache-Control': 'no-cache',
-    'Connection': 'keep-alive'
+    'Connection': 'keep-alive',
+    'Access-Control-Allow-Origin': '*'
   })
-  
+   Event.on('new:post', (post)=> {
+    stream.write(`event: message\ndata: ${post}\n\n`)
+   })
+   Event.on('testEvent', (testEvent)=> {
+    stream.write(`event: other\ndata: ${testEvent}\n\n`)
+   })
 } )
