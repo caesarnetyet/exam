@@ -15,8 +15,6 @@ export default class UsersController {
     });
     const data = await request.validate({ schema: userSchema });
     const user = await User.create(data);
-
-    Ws.io.emit("new:pet", user);
     return response.status(201).json(user);
   }
 
@@ -44,6 +42,12 @@ export default class UsersController {
     });
     return response.status(200).json(token);
   }
+
+  public async getAuthUser({ response, auth }: HttpContextContract) {
+    const user = await auth.use("api").authenticate();
+    return response.status(200).json(user);
+  }
+  
   public async show({ params, response }: HttpContextContract) {
     const user = await User.find(params.id);
     if (!user) {

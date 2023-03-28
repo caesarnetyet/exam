@@ -37,15 +37,7 @@ Route.group(() => {
     .middleware(["auth:api", "active"]);
 }).prefix("users");
 
-Route.group(() => {
-  Route.post("/", "PetsController.store");
-  Route.get("/", "PetsController.index");
-  Route.get("/:id", "PetsController.show").where("id", "[0-9]+");
-  Route.put("/:id", "PetsController.update").where("id", "[0-9]+");
-  Route.delete("/:id", "PetsController.destroy").where("id", "[0-9]+");
-})
-  .prefix("pets")
-  .middleware(["auth:api", "active"]);
+Route.get("/user", "UsersController.getAuthUser").middleware(["auth:api"]);
 
 Route.post("/testEvent", async ({ response }) => {
   Event.emit("testEvent", "testEvent");
