@@ -47,6 +47,12 @@ Route.group(() => {
   .prefix("pets")
   .middleware(["auth:api", "active"]);
 
+Route.post("/testEvent", async ({ response }) => {
+  Event.emit("testEvent", "testEvent");
+
+  return response.ok("testEvent");
+});
+
 Route.get("/events", async ({ response }) => {
   const stream = response.response;
   stream.writeHead(200, {

@@ -24,7 +24,9 @@ export default class User extends BaseModel {
   @column()
   public active: boolean;
 
-  @hasMany(() => Pet)
+  @hasMany(() => Pet, {
+    foreignKey: "user_id",
+  })
   public pets: HasMany<typeof Pet>;
 
   @column.dateTime({ autoCreate: true })
