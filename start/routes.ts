@@ -17,35 +17,48 @@
 | import './routes/customer'
 |
 */
-import Event from '@ioc:Adonis/Core/Event'
-import Route from '@ioc:Adonis/Core/Route'
+import Event from "@ioc:Adonis/Core/Event";
+import Route from "@ioc:Adonis/Core/Route";
 
-Route.get('/', async () => {
-  return { hello: 'world' }
-})
+Route.get("/", async () => {
+  return { hello: "world" };
+});
 
-Route.post('/post', async( {response} ) => {
-  Event.emit('new:post', 'new post')
-  return response.ok({message: 'post created'})
-})
-
-Route.post('/testEvent',async({response})=> {
-  Event.emit('testEvent', 'testEvent')
-  return response.ok({message: 'testEvent created'})
-})
-
-Route.get('/events', async({response}) => {
-  const stream = response.response
-  stream.writeHead(200, {
-    'Content-Type': 'text/event-stream',
-    'Cache-Control': 'no-cache',
-    'Connection': 'keep-alive',
-    'Access-Control-Allow-Origin': '*'
+Route.group(() => {
+  Route.post("/", "UsersController.store");
+  Route.get("/", "UsersController.index");
+  Route.post("/login", "UsersController.login");
+  Route.group(() => {
+    Route.get("/:id", "UsersController.show");
+    Route.put("/:id", "UsersController.update");
+    Route.delete("/:id", "UsersController.destroy");
   })
-   Event.on('new:post', (post)=> {
-    stream.write(`event: message\ndata: ${post}\n\n`)
-   })
-   Event.on('testEvent', (testEvent)=> {
-    stream.write(`event: other\ndata: ${testEvent}\n\n`)
-   })
-} )
+    .where("id", "[0-9]+")
+    .middleware(["auth:api", "active"]);
+}).prefix("users");
+
+Route.group(() => {
+  Route.post("/", "PetsController.store");
+  Route.get("/", "PetsController.index");
+  Route.get("/:id", "PetsController.show").where("id", "[0-9]+");
+  Route.put("/:id", "PetsController.update").where("id", "[0-9]+");
+  Route.delete("/:id", "PetsController.destroy").where("id", "[0-9]+");
+})
+  .prefix("pets")
+  .middleware(["auth:api", "active"]);
+
+Route.get("/events", async ({ response }) => {
+  const stream = response.response;
+  stream.writeHead(200, {
+    "Content-Type": "text/event-stream",
+    "Cache-Control": "no-cache",
+    Connection: "keep-alive",
+    "Access-Control-Allow-Origin": "*",
+  });
+  Event.on("new:post", (post) => {
+    stream.write(`event: message\ndata: ${post}\n\n`);
+  });
+  Event.on("testEvent", (testEvent) => {
+    stream.write(`event: other\ndata: ${testEvent}\n\n`);
+  });
+});
