@@ -47,7 +47,7 @@ export default class UsersController {
     const user = await auth.use("api").authenticate();
     return response.status(200).json(user);
   }
-  
+
   public async show({ params, response }: HttpContextContract) {
     const user = await User.find(params.id);
     if (!user) {
