@@ -15,6 +15,7 @@ Ws.io.on("connection", (socket) => {
     connectedUsers.splice(connectedUsers.indexOf(socket.id), 1);
     boats.splice(boats.indexOf(socket.id), 1);
     Ws.io.emit("connectedUsers", connectedUsers);
+    Ws.io.emit("boats", boats)
   });
 
   console.log("Connected users", connectedUsers.length);
@@ -26,15 +27,18 @@ Ws.io.on("connection", (socket) => {
     }
     boats[position] = socket.id
     console.log(boats)
+    Ws.io.emit("boats", boats);
   })
-  
 
   Ws.io.emit("connectedUsers", connectedUsers);
 
-  socket.on("start", (startPosition: number) => {
-    console.log("paso 2", startPosition);
-    Ws.io.emit("boatPosition", startPosition);
+  socket.on("start", () => {
+    console.log("paso 2", boats[0]);
+    
+    Ws.io.emit("boatPosition", 0);
   });
+
+
   socket.on("nextBoat", (nextNumber: number) => {
     Ws.io.emit("boatPosition", nextNumber);
   });
