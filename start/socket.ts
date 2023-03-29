@@ -1,4 +1,5 @@
 import Ws from "App/Services/Ws";
+
 Ws.boot();
 
 const connectedUsers: string[] = [];
@@ -26,3 +27,4 @@ Ws.io.on("connection", (socket) => {
     Ws.io.emit("boatPosition", nextNumber);
   });
 });
+
